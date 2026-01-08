@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: python-api-small
+spec:
+  selector:
+    matchLabels:
+      app: python-api
+      size: small
+  template:
+    metadata:
+      labels:
+        app: python-api
+        size: small
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9000"
+        prometheus.io/path: "/metrics"
+    spec:
+      containers:
+      - name: python-api-container
+        image: sample_api
+        ports:
+        - containerPort: 8000
+        volumeMounts:
+        - name: shared-data
+          mountPath: /app/data
+        imagePullPolicy: Never
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "50m"
+          limits:
+            memory: "256Mi"
+            cpu: "100m"
+
+      volumes:
+      - name: shared-data
+        emptyDir: {}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: python-api-small-svc
+spec:
+  selector:
+    app: python-api
+    size: small
+  ports:
+  - name: api
+    port: 8000
+    targetPort: 8000
+  - name: metrics
+    port: 9000
+    targetPort: 9000
