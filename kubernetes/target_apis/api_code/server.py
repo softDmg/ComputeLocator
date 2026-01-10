@@ -43,7 +43,6 @@ def before_request():
 @app.after_request
 def after_request(response):
     end_time = time.time_ns()
-
     # Also log full details as JSON
     log_entry = {
         'type': "prev_request_history",
@@ -156,11 +155,10 @@ def collect_process_metrics():
 # API ROUTES
 # =============================================================================
 
-@app.route('/ml', methods=['POST', 'GET'])
+@app.route('/ml', methods=['POST'])
 def ml():
     ml_method(**request.json)
-    return "endpoint OK\n"
-
+    return {"data": "endpoint OK\n"}
 
 @app.route('/health')
 def health():
@@ -171,4 +169,4 @@ if __name__ == '__main__':
     threading.Thread(target=collect_process_metrics, daemon=True).start()
     print("API: http://0.0.0.0:8000")
     print("Metrics: http://0.0.0.0:9000/metrics")
-    app.run(host='0.0.0.0', port=8000, threaded=True)
+    app.run(host='0.0.0.0', port=8000)

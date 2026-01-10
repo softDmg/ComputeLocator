@@ -1,7 +1,6 @@
 import json
 import time
 from typing import Tuple
-
 import requests
 from flask import Flask
 import pandas as pd
@@ -9,7 +8,7 @@ import pandas as pd
 app = Flask(__name__)
 
 class PrometheusClient:
-    def __init__(self, base_url="http://localhost:9090"):
+    def __init__(self, base_url="http://localhost:9090"): # or localhost if port forward prometheus-service
         self.base_url = base_url.rstrip("/")
 
     def _get(self, path, params):
@@ -43,13 +42,19 @@ class PrometheusClient:
                 formatted_data[0]['ip'])
 
 class LokiClient:
-    def __init__(self, base_url="http://localhost:3100"):
+    def __init__(self, base_url="http://localhost:3100"): # or localhost if port forward loki
         self.base_url = base_url.rstrip("/")
 
     def query_range(self, query,
-                    start = int(time.time()*1e9)-int(20 * 3600 * 1e9), # 20h ago
-                    end = int(time.time()*1e9),
+                    start = None, # 20h ago
+                    end = None,
                     limit=1000):
+        ts = int(time.time() * 1e9)
+        if start is None:
+            start = ts - int(24 * 3600 * 1e9) # starting 1d ago
+        if end is None:
+            end =   ts + int(24 * 3600 * 1e9) # until 1d later
+
         url = f"{self.base_url}/loki/api/v1/query_range"
         params = {
             "query": query,
@@ -74,7 +79,7 @@ def history():
     final_logs = []
     for filename in loki_client.query_dinstinct_labels():
         for res in loki_client.query_range(f'{{filename="{filename}"}}'):
-            if res["stream"]["detected_level"] != "info":
+            if res["stream"]["detected_level"] != "info": #TODO so many manual filter because I don't know how to query properly loki
                 continue
             pod_name = filename.split("/")[-1].split("_")[0]
             for log_entry in res["values"]:
@@ -96,5 +101,6 @@ def service_discovery():
     return prometheus_client.get_label_associations()
 
 if __name__ == '__main__':
-    print("API: http://localhost:8000")
-    app.run(host='0.0.0.0', port=8080, threaded=True)
+    print("API: http://localhost:5000")
+    app.run(host='0.0.0.0', port=5000, threaded=True)
+

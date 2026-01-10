@@ -3,6 +3,5 @@ FROM python:3.12.12
 WORKDIR /app
 COPY . /app
 RUN pip install --no-cache-dir -r req.txt
-EXPOSE 5000
 
-CMD ["python", "server.py"]
+CMD ["python", "main.py"]

@@ -143,18 +143,11 @@ spec:
       - name: cluster-data-api
         image: cluster_api
         ports:
-          - containerPort: 8080
+          - containerPort: 5000
         volumeMounts:
           - name: cluster-data
             mountPath: /app/data
         imagePullPolicy: Never
-        resources:
-          requests:
-            memory: "512Mi"
-            cpu: "250m"
-          limits:
-            memory: "1Gi"
-            cpu: "500m"
       volumes:
       - name: cluster-data
         emptyDir: { }
@@ -185,11 +178,11 @@ metadata:
   name: cluster-data-api-svc
 spec:
   selector:
-    app: cluster-data-api
+    app: prometheus
   ports:
   - name: api
-    port: 8080
-    targetPort: 8080
+    port: 5000
+    targetPort: 5000
 
 ---
 apiVersion: v1
@@ -205,7 +198,19 @@ spec:
     port: 9090
     targetPort: 9090
     nodePort: 30090
-
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: loki
+spec:
+  selector:
+    app: prometheus
+  ports:
+  - name: loki
+    port: 3100
+    targetPort: 3100
+  type: ClusterIP
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -272,7 +277,7 @@ data:
       filename: /tmp/positions.yaml
 
     clients:
-      - url: http://localhost:3100/loki/api/v1/push
+      - url: http://loki:3100/loki/api/v1/push
 
     scrape_configs:
       - job_name: python-api-logs
