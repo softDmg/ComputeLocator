@@ -86,7 +86,7 @@ PROCESS_CTX_INVOLUNTARY = Gauge('process_ctx_switches_involuntary', 'Involuntary
 PROCESS_CONNECTIONS = Gauge('process_connections', 'Number of network connections')
 
 # Uptime
-PROCESS_UPTIME = Gauge('process_uptime_seconds', 'Process uptime in seconds')
+PROCESS_UPTIME = Gauge('process_uptime_seconds', 'Process uptime in seconds') #TODO make it nano seconds or ms
 
 # Info
 PROCESS_INFO = Info('process', 'Process information')
@@ -148,7 +148,7 @@ def collect_process_metrics():
         except Exception as e:
             print(f"Metrics error: {e}")
 
-        time.sleep(5)
+        time.sleep(1)
 
 
 # =============================================================================

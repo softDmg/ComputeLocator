@@ -18,10 +18,16 @@ class CustomApiClient:
 
     def init_ml(self, ip):
         PAYLOADS = [{"input": 1},
-                     {"input": 10},
-                     {"input": 100},
-                     {"input": 1_000},
-                     {"input": 10_000}]
+                    {"input": 2},
+                    {"input": 5},
+                    {"input": 9},
+                    {"input": 10},
+                    {"input": 50},
+                    {"input": 100},
+                    {"input": 1_000},
+                    {"input": 10_000},
+                    {"input": 100_000}
+        ]
         self._init_enpoint(ip, "ml", PAYLOADS)
 
 

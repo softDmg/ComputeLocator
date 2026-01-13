@@ -1,6 +1,6 @@
 import json
 import time
-from typing import Tuple
+from typing import Tuple, Any
 import requests
 from flask import Flask
 import pandas as pd
@@ -31,7 +31,15 @@ class PrometheusClient:
                           "start": start,
                           "end": end,
                           "step": step})
-        hidden_list = ["flask_http_request_duration_seconds_bucket", "python_gc_collections_total", 'python_gc_objects_collected_total', 'python_gc_objects_uncollectable_total']
+        hidden_list = ["flask_http_request_duration_seconds_bucket",
+                       "python_gc_collections_total",
+                       'python_gc_objects_collected_total',
+                       'python_gc_objects_uncollectable_total',
+                       'scrape_duration_seconds',
+                       'scrape_samples_post_metric_relabeling',
+                       'scrape_samples_scraped',
+                       'scrape_series_added',
+                       ]
         formatted_data = [{  "ip": series["metric"]["pod_ip"],
                             "metric_name": series["metric"]["__name__"],
                             "timestamp": pd.to_datetime(float(ts), unit="s"),
@@ -75,7 +83,7 @@ loki_client = LokiClient()
 prometheus_client = PrometheusClient()
 @app.route('/history', methods=['GET'])
 def history():
-    global loki_client, prometheus_client
+    global loki_client
     final_logs = []
     for filename in loki_client.query_dinstinct_labels():
         for res in loki_client.query_range(f'{{filename="{filename}"}}'):
@@ -83,17 +91,22 @@ def history():
                 continue
             pod_name = filename.split("/")[-1].split("_")[0]
             for log_entry in res["values"]:
-                exec_result = json.loads(json.loads(log_entry[1])["log"][5:-1])
-                end_ts = exec_result["end_timestamp_ns"] * 1e-9
-                start_ts = exec_result["start_timestamp_ns"] * 1e-9
-                metrics, pod_ip = prometheus_client.query_all_metrics_for_pod(pod_name, start_ts, end_ts)
-
-                final_logs.append({"pod": pod_name,
-                                   "ip": pod_ip,
-                                   "input": exec_result["payload"],
-                                   "function": exec_result["endpoint"][1:],
-                                   "states": metrics})
+                final_logs.append(format_log(pod_name, log_entry))
     return json.dumps(final_logs)
+
+def format_log(pod_name, log_entry):
+    global prometheus_client
+    exec_result = json.loads(json.loads(log_entry[1])["log"][5:-1])
+    end_ts = exec_result["end_timestamp_ns"] * 1e-9
+    start_ts = exec_result["start_timestamp_ns"] * 1e-9
+    metrics, pod_ip = prometheus_client.query_all_metrics_for_pod(pod_name, start_ts, end_ts)
+    return {"pod": pod_name,
+           "ip": pod_ip,
+            "exec_duration_ns": exec_result["end_timestamp_ns"] - exec_result["start_timestamp_ns"],
+            "input": exec_result["payload"],
+           "function": exec_result["endpoint"][1:],
+           "states": metrics}
+
 
 @app.route('/endpoints', methods=['GET'])
 def service_discovery():

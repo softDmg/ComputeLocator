@@ -1,22 +1,5 @@
-import time
-
-import pandas as pd
-
-from tested_api_client import CustomApiClient
 from cluster_data_client import ClusterApiClient
-
-# get PODs
-cluster_data_client = ClusterApiClient()
-ENDPOINTS = cluster_data_client.getEndpoints()
-
-
-ips = [e["pod_ip"] for e in ENDPOINTS]
-
-# request test set
-api_client = CustomApiClient(ips)
-api_client.init_requests()
-
-time.sleep(10) # waiting for loki and prometheus to get everything, could be smaller I guess (pull pattern)
+import pandas as pd
 
 
 def flatten_dict(d, parent_key='', sep='.'):
@@ -38,20 +21,22 @@ def feature_engineer(df):
 
     df["states.cpu_duration_second.end"] = df["states.process_cpu_seconds_total.end"] - df["states.process_cpu_seconds_total.start"]
     df = df.drop(columns=["states.process_cpu_seconds_total.start", "states.process_cpu_seconds_total.end"])
+
+    df = df.loc[:, df.nunique() > 1]
     return df
 
-
+cluster_data_client = ClusterApiClient(api_name="localhost")
 input_data = feature_engineer(pd.DataFrame([flatten_dict(e) for e in cluster_data_client.getHistory()]))
 
 # model training
 cols = input_data.columns
-X_cols = [c for c in cols if "input." in c or ".start" in c or c in ["pod", "function"] ]
+X_cols = [c for c in cols if "input." in c or ".start" in c or c in ["pod", "function", "exec_duration_ns"] ]
+
 Y_cols = [c for c in cols if ".end" in c]
 
 print("Finished")
 
 # model testing
-
 
 # plotting results
 

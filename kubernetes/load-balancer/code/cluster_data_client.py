@@ -1,9 +1,11 @@
+import json
+
 import requests
 
 
 class ClusterApiClient:
-    def __init__(self, port=5000):
-        self.endpoints = "cluster-data-api-svc"
+    def __init__(self, port=5000, api_name="cluster-data-api-svc"):
+        self.endpoints = api_name
         self.port = port
 
     def _get(self, endpoint):

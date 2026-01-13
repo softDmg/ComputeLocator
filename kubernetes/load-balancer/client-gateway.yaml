@@ -10,3 +10,4 @@ spec:
         image: client-gateway
         imagePullPolicy: Never
       restartPolicy: Never
+
