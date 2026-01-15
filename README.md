@@ -51,7 +51,7 @@ envoyer des appels à l'api de test :
 ```shell
 curl --request POST --url http://localhost:8000/ml --header 'content-type: application/json'   --data '{"input":15}'
 ```
-
+    
 complete commands sequence
 ````shell
 kubectl apply -f ./kubernetes/target_apis/ && kubectl apply -f ./kubernetes/service_registry/ && kubectl get pods
