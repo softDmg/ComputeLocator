@@ -16,7 +16,7 @@ class CustomApiClient:
         for param in params:
             self._post(f"http://{ip}:{self.port}/{endpoint}", param)
 
-    def init_ml(self, ip):
+    def _init_ml(self, ip):
         PAYLOADS = [{"input": 1},
                     {"input": 2},
                     {"input": 5},
@@ -30,7 +30,24 @@ class CustomApiClient:
         ]
         self._init_enpoint(ip, "ml", PAYLOADS)
 
+    def _init_dense(self, ip):
+        PAYLOADS = [{}]
+        self._init_enpoint(ip, "dense", PAYLOADS)
+
+    def _init_pi(self, ip):
+        PAYLOADS = [{}]
+        self._init_enpoint(ip, "pi", PAYLOADS)
+
+    def _init_video(self, ip):
+        PAYLOADS = [{}]
+        self._init_enpoint(ip, "video", PAYLOADS)
 
     def init_requests(self):
         for endpoint in self.endpoints:
-            self.init_ml(endpoint)
+            self._init_ml(endpoint)
+            self._init_dense(endpoint)
+            self._init_pi(endpoint)
+            self._init_video(endpoint)
+
+
+

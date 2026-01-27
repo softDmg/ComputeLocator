@@ -1,3 +1,5 @@
 flask
 prometheus-flask-exporter
 psutil
+numpy
+tensorflow-cpu

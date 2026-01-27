@@ -32,7 +32,7 @@ Deploy cluster
 kubectl apply -f ./kubernetes/target_apis/ && kubectl apply -f ./kubernetes/service_registry/ && kubectl get pods
 ```
 
-Init data
+Init data:
 ```shell
 kubectl apply -f ./kubernetes/load-balancer/
 ```
@@ -40,6 +40,7 @@ kubectl apply -f ./kubernetes/load-balancer/
 Forwarding ports to test cluster on the host
 ```shell
 kubectl port-forward deployment/prometheus-server 5000:5000
+kubectl port-forward deployment/python-api-large 8000:8000
 ```
 
 Récupérer les données formatées :

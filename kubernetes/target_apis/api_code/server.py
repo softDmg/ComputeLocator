@@ -10,6 +10,9 @@ from prometheus_flask_exporter import PrometheusMetrics
 from prometheus_client import Gauge, Info
 import psutil
 from functions.ML import ml_method
+from functions.pi_estimation import pi_estimation
+from functions.dense_network import dense_network
+from functions.video_encoding import video_encoding
 
 app = Flask(__name__)
 metrics = PrometheusMetrics(app, path=None)
@@ -19,11 +22,6 @@ metrics.start_http_server(9000)
 # =============================================================================
 # STRUCTURED LOGGING (individual request details)
 # =============================================================================
-# logger = logging.getLogger('api')
-# logger.setLevel(logging.INFO)
-# handler = logging.StreamHandler(sys.stdout)
-# handler.setFormatter(logging.Formatter('%(message)s'))
-# logger.addHandler(handler)
 handler = logging.StreamHandler(sys.stdout)
 handler.setLevel(logging.INFO)
 formatter = logging.Formatter('%(levelname)s %(message)s')
@@ -159,6 +157,27 @@ def collect_process_metrics():
 def ml():
     ml_method(**request.json)
     return {"data": "endpoint OK\n"}
+
+@app.route('/pi', methods=['POST', 'GET'])
+def pi():
+    if request.json:
+        return pi_estimation(**request.json)
+    return pi_estimation()
+
+
+@app.route('/dense', methods=['POST', 'GET'])
+def dense():
+    if request.json:
+        return dense_network(**request.json)
+    return dense_network()
+
+
+@app.route('/video', methods=['POST', 'GET'])
+def video():
+    if request.json:
+        return video_encoding(**request.json)
+    return video_encoding()
+
 
 @app.route('/health')
 def health():

@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+
+# Video encoding data (large files)
+Deployment/ArticleFunctions/VideoEncoding/data/
+!Deployment/ArticleFunctions/VideoEncoding/data/.gitkeep
+Deployment/ArticleFunctions/MachineLearning/data/
+Deployment/ArticleFunctions/InMemoryDataAnalytics/data/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
