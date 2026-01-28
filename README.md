@@ -1,6 +1,6 @@
 # ComputeLocator
 
-A Kubernetes-based platform that collects runtime metrics from heterogeneous containerized workloads and trains ML models to predict execution performance for compute placement decisions.
+A Kubernetes-based platform that collects runtime metrics from heterogeneous containerized workloads for execution performance prediction experiments, supporting dynamic compute placement decisions.
 
 ## Research context
 
@@ -83,9 +83,9 @@ ComputeLocator/
     └── img.png                       # Architecture diagram
 ```
 
-## Tech stack
+## Current Tech stack
 
-Python, Flask, TensorFlow, XGBoost, scikit-learn, NumPy, pandas, Kubernetes, Docker, Prometheus, Loki, Promtail, FFmpeg, psutil
+Python, Flask, pandas, Kubernetes, Docker, Prometheus, Loki, Promtail
 
 ## Getting started
 
